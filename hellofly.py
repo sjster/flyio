@@ -38,7 +38,12 @@ def process_files(name=None):
         data = f.readlines()
         for line in data:
             decoded_data = json.loads(line)
-            text.append(decoded_data['text'])
+            testimonial = TextBlob(decoded_data['text'])
+            text.append(decoded_data['text'] + ' --- ' + str(testimonial.sentiment.polarity))
+
+    resfile = file.split('/')[1]
+    with fs.open('tweetanalyzerres/' + resfile, mode='w') as file:
+                file.write(str(text))
 
     return(str(text))
 
