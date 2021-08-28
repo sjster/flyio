@@ -4,3 +4,4 @@ numpy
 pandas
 spacy
 textblob
+s3fs

@@ -2,7 +2,6 @@ import s3fs
 from credentials import *
 import configparser
 import json
-import pprint
 import os
 
 config = configparser.RawConfigParser()
