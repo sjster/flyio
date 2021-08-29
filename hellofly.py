@@ -20,6 +20,7 @@ def process_files(name=None):
     jsondata = request.get_json(force=False)
     file = jsondata['filename']
 
+    print("filename -- ",file)
     profile_name = 'wasabi'
     profile_type = 'wasabi'
 
@@ -33,7 +34,7 @@ def process_files(name=None):
                   ,client_kwargs={'endpoint_url':'https://s3.wasabisys.com'})
 
     text = []
-    with fs.open(file, mode='r') as f:
+    with fs.open('tweetanalyzer/' + file, mode='r') as f:
     #with open('/Users/srijithraj/Documents/Development/twitter_streaming/local_files/AAPL_1626653527.txt','r') as file:
         data = f.readlines()
         for line in data:
@@ -41,8 +42,8 @@ def process_files(name=None):
             testimonial = TextBlob(decoded_data['text'])
             text.append(decoded_data['text'] + ' --- ' + str(testimonial.sentiment.polarity))
 
-    resfile = file.split('/')[1]
-    with fs.open('tweetanalyzerres/' + resfile, mode='w') as file:
+
+    with fs.open('tweetanalyzerres/' + file, mode='w') as file:
                 file.write(str(text))
 
     return(str(text))
