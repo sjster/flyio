@@ -4,23 +4,45 @@ from textblob import TextBlob
 import s3fs
 import configparser
 import json
+from datetime import datetime
 import os
 
 app = Flask(__name__)
 
 @app.route('/')
-@app.route('/sentiment', methods=['POST'])
 def hello(name=None):
+    print("IP address -- ",request.remote_addr)
+    if(request.remote_addr != '127.0.0.1'):
+        print('Not authorized')
+        return("500")
+
+    print('Time --', str(datetime.now()))
+
+    return('Nothing here')
+
+
+@app.route('/sentiment', methods=['POST'])
+def sentiment(name=None):
+    print("IP address -- ",request.remote_addr)
+    if(request.remote_addr != '127.0.0.1'):
+        print('Not authorized')
+        return("500")
+
     jsondata = request.get_json(force=False)
+
     testimonial = TextBlob(jsondata['text'])
     return(jsondata['text'] + ' ---    ' + str(testimonial.sentiment.polarity))
 
+
 @app.route('/files', methods=['POST'])
 def process_files(name=None):
+    print("IP address -- ",request.remote_addr)
+
     jsondata = request.get_json(force=False)
     file = jsondata['filename']
 
     print("filename -- ",file)
+
     profile_name = 'wasabi'
     profile_type = 'wasabi'
 
@@ -33,7 +55,11 @@ def process_files(name=None):
         fs = s3fs.S3FileSystem( key=ACCESS_KEY_ID, secret=SECRET_ACCESS_KEY \
                   ,client_kwargs={'endpoint_url':'https://s3.wasabisys.com'})
 
+    fs.invalidate_cache()
+
     text = []
+    print('Time --', str(datetime.now()))
+    print('Opening file -- ', 'tweetanalyzer/' + file)
     with fs.open('tweetanalyzer/' + file, mode='r') as f:
     #with open('/Users/srijithraj/Documents/Development/twitter_streaming/local_files/AAPL_1626653527.txt','r') as file:
         data = f.readlines()
@@ -47,8 +73,3 @@ def process_files(name=None):
                 file.write(str(text))
 
     return(str(text))
-
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
